@@ -1,0 +1,268 @@
+#!/bin/bash
+
+stack=(0 0 0 0 0 0 0 0 0 0)
+
+while true; do
+
+clear
+
+echo "9: ${stack[9]}"
+echo "8: ${stack[8]}"
+echo "7: ${stack[7]}"
+echo "6: ${stack[6]}"
+echo "5: ${stack[5]}"
+echo "4: ${stack[4]}"
+echo "3: ${stack[3]}"
+echo "2: ${stack[2]}"
+echo "1: ${stack[1]}"
+echo "0: ${stack[0]}"
+
+read input
+
+echo $input > math.txt
+
+field1=$(awk '{print $1}' math.txt)
+field2=$(awk '{print $2}' math.txt)
+field3=$(awk '{print $3}' math.txt)
+
+echo "${stack[0]} ${stack[1]} ${stack[2]} ${stack[3]} ${stack[4]} ${stack[5]} ${stack[6]} ${stack[7]} ${stack[8]} ${stack[9]} $field2 $field3" > stack.txt
+
+if [[ $field1 =~ ^-?[0-9]+.?[0-9]+$ ]]
+	then
+	stack[9]=${stack[8]}
+	stack[8]=${stack[7]}
+        stack[7]=${stack[6]}
+        stack[6]=${stack[5]}
+        stack[5]=${stack[4]}
+	stack[4]=${stack[3]}
+	stack[3]=${stack[2]}
+	stack[2]=${stack[1]}
+	stack[1]=${stack[0]}
+	stack[0]=$input
+elif [[ $field1 =~ ^-?.?[0-9]+$ ]]
+        then
+	stack[9]=${stack[8]}
+        stack[8]=${stack[7]}
+        stack[7]=${stack[6]}
+        stack[6]=${stack[5]}
+        stack[5]=${stack[4]}
+        stack[4]=${stack[3]}
+        stack[3]=${stack[2]}
+        stack[2]=${stack[1]}
+        stack[1]=${stack[0]}
+        stack[0]=$input
+
+elif [[ "$field1" = "swap" ]]
+	then
+	tmp=${stack[$field2]}
+	stack[$field2]=${stack[$field3]}
+	stack[$field3]=$tmp	
+
+elif [[ "$field1" = "sp" ]]
+        then
+        tmp=${stack[$field2]}
+        stack[$field2]=${stack[$field3]}
+        stack[$field3]=$tmp
+
+elif [[ "$field1" = "rot" ]]
+        then
+	tmp=${stack[0]}
+        stack[0]=${stack[1]}
+        stack[1]=${stack[2]}
+        stack[2]=${stack[3]}
+        stack[3]=${stack[4]}
+        stack[4]=${stack[5]}
+        stack[5]=${stack[6]}
+        stack[6]=${stack[7]}
+        stack[7]=${stack[8]}
+        stack[8]=${stack[9]}
+        stack[9]=$tmp
+
+elif [[ "$field1" = "unrot" ]]
+	then
+	tmp=${stack[9]}
+	stack[9]=${stack[8]}
+        stack[8]=${stack[7]}
+        stack[7]=${stack[6]}
+        stack[6]=${stack[5]}
+        stack[5]=${stack[4]}
+        stack[4]=${stack[3]}
+        stack[3]=${stack[2]}
+        stack[2]=${stack[1]}
+        stack[1]=${stack[0]}
+        stack[0]=$tmp
+
+elif [[ "$field1" = "copy" ]]
+	then
+	stack[$field3]=${stack[$field2]}
+
+elif [[ "$field1" = "cp" ]]
+	then
+	stack[$field3]=${stack[$field2]}
+
+elif [[ "$field1" = "clear" ]]
+        then
+	stack=(0 0 0 0 0 0 0 0 0 0)
+
+elif [[ "$field1" = "del" ]]
+	then
+	tmp=$field2
+
+	while [ $tmp -lt 9 ]
+	do	
+		tmp2=$[$tmp+1]
+		stack[$tmp]=${stack[$tmp2]}
+		tmp=$tmp2
+	done
+	
+	stack[9]=0
+	
+elif [[ "$field1" = "+" ]]
+	then
+	tmp=$(awk '{print $2 + $1 }' stack.txt)
+	stack[1]=${stack[2]}
+        stack[2]=${stack[3]}
+        stack[3]=${stack[4]}
+	stack[4]=${stack[5]}
+        stack[5]=${stack[6]}
+        stack[6]=${stack[7]}
+        stack[7]=${stack[8]}
+        stack[8]=${stack[9]}
+        stack[9]=0
+        stack[0]=$tmp 
+
+elif [[ "$field1" = "-" ]]
+        then
+        tmp=$(awk '{print $2 - $1 }' stack.txt)
+	stack[1]=${stack[2]}
+        stack[2]=${stack[3]}
+        stack[3]=${stack[4]}
+	stack[4]=${stack[5]}
+        stack[5]=${stack[6]}
+        stack[6]=${stack[7]}
+        stack[7]=${stack[8]}
+        stack[8]=${stack[9]}
+        stack[9]=0  
+        stack[0]=$tmp  
+
+elif [[ "$field1" = "x" ]]
+        then
+        tmp=$(awk '{print $2 * $1 }' stack.txt) 
+	stack[1]=${stack[2]}
+        stack[2]=${stack[3]}
+        stack[3]=${stack[4]}
+	stack[4]=${stack[5]}
+        stack[5]=${stack[6]}
+        stack[6]=${stack[7]}
+        stack[7]=${stack[8]}
+        stack[8]=${stack[9]}
+        stack[9]=0
+        stack[0]=$tmp  
+
+elif [[ "$field1" = "/" ]]
+        then
+        tmp=$(awk '{print $2 / $1 }' stack.txt) 
+	stack[1]=${stack[2]}
+        stack[2]=${stack[3]}
+        stack[3]=${stack[4]}
+	stack[4]=${stack[5]}
+        stack[5]=${stack[6]}
+        stack[6]=${stack[7]}
+        stack[7]=${stack[8]}
+        stack[8]=${stack[9]}
+        stack[9]=0
+        stack[0]=$tmp
+elif [[ "$field1" = "^" ]]
+        then
+        tmp=$(awk '{print $2 ^ $1 }' stack.txt)
+        stack[1]=${stack[2]}
+        stack[2]=${stack[3]}
+        stack[3]=${stack[4]}
+	stack[4]=${stack[5]}
+        stack[5]=${stack[6]}
+        stack[6]=${stack[7]}
+        stack[7]=${stack[8]}
+        stack[8]=${stack[9]}
+        stack[9]=0
+        stack[0]=$tmp  
+elif [[ "$field1" = "sin" ]]
+        then
+        tmp=$(awk '{print sin($1)}' stack.txt)
+        stack[0]=$tmp
+elif [[ "$field1" = "cos" ]]
+        then
+        tmp=$(awk '{print cos($1)}' stack.txt)
+        stack[0]=$tmp
+elif [[ "$field1" = "tan" ]]
+        then
+        tmp=$(awk '{print sin($1) / cos($1)}' stack.txt)
+        stack[0]=$tmp
+elif [[ "$field1" = "cot" ]]
+        then
+        tmp=$(awk '{print cos($1) / sin($1)}' stack.txt)
+        stack[0]=$tmp
+elif [[ "$field1" = "sec" ]]
+        then
+        tmp=$(awk '{print 1.0 / cos($1)}' stack.txt)
+        stack[0]=$tmp
+elif [[ "$field1" = "csc" ]]
+        then
+        tmp=$(awk '{print 1.0 / sin($1)}' stack.txt)
+        stack[0]=$tmp
+elif [[ "$field1" = "ln" ]]
+        then
+        tmp=$(awk '{print log($1)}' stack.txt)
+        stack[0]=$tmp
+elif [[ "$field1" = "log" ]]
+        then
+        tmp=$(awk '{print log($1) / log($6)}' stack.txt)
+        stack[0]=$tmp
+elif [[ "$field1" = "e" ]]
+        then
+	stack[9]=${stack[8]}
+        stack[8]=${stack[7]}
+        stack[7]=${stack[6]}
+        stack[6]=${stack[5]}
+        stack[5]=${stack[4]}
+	stack[4]=${stack[3]}
+        stack[3]=${stack[2]}
+        stack[2]=${stack[1]}
+        stack[1]=${stack[0]}
+        tmp=$(awk '{print exp(1)}' stack.txt)
+        stack[0]=$tmp
+elif [[ "$field1" = "pi" ]]
+        then
+	stack[9]=${stack[8]}
+        stack[8]=${stack[7]}
+        stack[7]=${stack[6]}
+        stack[6]=${stack[5]}
+        stack[5]=${stack[4]}
+        stack[4]=${stack[3]}
+        stack[3]=${stack[2]}
+        stack[2]=${stack[1]}
+        stack[1]=${stack[0]}
+        tmp=$(awk '{print atan2(1.0, 1.0) * 4}' stack.txt)
+        stack[0]=$tmp
+
+elif [[ "$field1" = "off" ]]
+	then
+	cls
+	break
+
+elif [[ "$field1" = "stop" ]]
+        then
+        cls
+        break
+
+elif [[ "$field1" = "done" ]]
+        then
+        cls
+        break
+
+elif [[ "$field1" = "exit" ]]
+        then
+        cls
+        break
+fi
+
+done
